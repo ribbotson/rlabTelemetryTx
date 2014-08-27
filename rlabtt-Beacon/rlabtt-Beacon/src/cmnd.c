@@ -463,7 +463,8 @@ void   show_config(void)
 		printf("Serial at Startup = ");
 		if (config.uart_on_startup == START_UART_USB) printf("USB\n");
 		else if(config.uart_on_startup == START_UART_EXT) printf("EXT UART\n"); 
-		else if(config.uart_on_startup == START_UART_AUTO) printf("Auto Detect\n");	
+		else if(config.uart_on_startup == START_UART_AUTO) printf("Auto Detect\n");
+		else if(config.uart_on_startup == START_UART_NONE) printf("No UART\n");	
 		else printf("??\n");	
 		
 		printf("Beacon Repeat Time = %d\n", config.beacon_repeat_time);
@@ -478,12 +479,8 @@ void   show_config(void)
 		
 		printf("Transmit Trim = %X\n", config.tx_trim);
 		
-		
-		unsigned char	beacon_repeat_time; // units of 500ms
-		char			payload_id[10];
-		char			modulation_mode;
-		char			tx_channel;
-		char			tx_trim;	
+		printf("Cutdown Altitude = %f", config.cutdown_altitude);
+			
 	
 }
 

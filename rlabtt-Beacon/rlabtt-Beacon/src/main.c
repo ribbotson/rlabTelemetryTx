@@ -60,12 +60,13 @@ char * build_date =  (char *) __DATE__ ;
 
 // mapping of files for fprintf
 FILE usbout = FDEV_SETUP_STREAM(comms_usb_putchar, NULL,_FDEV_SETUP_WRITE);
+FILE extout =FDEV_SETUP_STREAM(ext_ser_putchar, NULL,_FDEV_SETUP_WRITE);
 FILE ntx2bout =FDEV_SETUP_STREAM(ntx2b_ser_putchar, NULL,_FDEV_SETUP_WRITE);
 
 // external Status Variables
 
 extern char transmit_state;
-
+extern char power_status;
 // Global configuration
 struct MAGIC magic = {.magic_number= EEPROM_MAGIC_NUMBER, .config_version = EEPROM_CONFIG_VERSION};
 	
@@ -74,11 +75,14 @@ struct CONFIG config = {.uart_on_startup = START_UART_AUTO,
 						.payload_id = "rlabtt",
 						.modulation_mode = RTTY300,
 						.tx_channel = 1,
-						.tx_trim = 0x40 };
+						.tx_trim = 0x40,
+						.cutdown_altitude = 10000.0 };
 
 // String to be sent as beacon and its length
 char		beacon_string[100];
 unsigned char	beacon_length;
+
+char serial_port = SERIAL_NONE;
 
 // External Task request flags
 extern volatile bool    b500msecTaskReq;
@@ -126,23 +130,71 @@ int main(void)
 	// default led to off
 	LED_Off(LED0_GPIO);
 	
-	
-	
-	// Start USB stack to authorize VBus monitoring
-	udc_start();
-		
-	
 	// Start the ADC for power monitoring
 	adc_enable(&MY_ADC);
-
+	
 	// Initialise GPS and I2C devices
 	sensor_init();
 	
-	
-	// Start all the comms ports	
+	// Start all the comms ports
 	comms_init();
-	// map stdout
-	stdout = &usbout;
+	
+	
+	// find out source of power
+	check_power_source();
+	
+	if(config.uart_on_startup == START_UART_USB)
+	{
+		if(power_status == POWER_USB || power_status == POWER_BOTH)
+		{
+			// Start USB stack
+			udc_start(); // should check if really started
+			serial_port = SERIAL_USB;
+			// map stdout
+			stdout = &usbout;
+		}
+	}
+	
+	else if(config.uart_on_startup == START_UART_AUTO)
+	{
+		if(power_status == POWER_USB || power_status == POWER_BOTH)
+		{
+			// Start USB stack
+			udc_start();
+			serial_port = SERIAL_USB;
+			// map stdout
+			stdout = &usbout;
+		}
+		else
+		{
+			serial_port = SERIAL_EXT;
+			// map stdout
+			stdout = &extout;
+			
+		}
+	}
+	
+	else if(config.uart_on_startup == START_UART_EXT)
+	{
+		serial_port = SERIAL_EXT;
+		// map stdout
+		stdout = &extout;
+	}		
+	
+	
+	
+	
+	// for testing startup
+		
+	LED_On(LED0_GPIO);
+	
+	
+	
+
+	
+	
+	
+	
 	
 	// start the timers
 	timer_init();

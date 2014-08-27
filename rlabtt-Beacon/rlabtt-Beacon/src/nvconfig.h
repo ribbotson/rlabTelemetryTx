@@ -43,9 +43,10 @@
 #define NVCONFIG_H_
 #include "asf.h"
 
-#define		START_UART_USB	0
-#define		START_UART_EXT	1
-#define		START_UART_AUTO 2
+#define		START_UART_NONE	0
+#define		START_UART_USB	1
+#define		START_UART_EXT  2
+#define		START_UART_AUTO 3
 
 #define		MAGIC_EEPROM_PAGE	0
 #define		CONFIG_EEPROM_PAGE	1
@@ -68,6 +69,7 @@ struct CONFIG {
 	char			modulation_mode;
 	char			tx_channel;
 	char			tx_trim;
+	float			cutdown_altitude;
 };
 
 

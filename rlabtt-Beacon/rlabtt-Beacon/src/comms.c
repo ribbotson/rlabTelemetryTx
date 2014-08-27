@@ -56,6 +56,7 @@ extern volatile bool	ntx2b_mod_busy_flag;
 extern volatile unsigned char mod_state;
 volatile bool	cdcRxChar;
 extern FILE usbout;
+extern FILE extout;
 char transmit_state = TRANSMIT_OFF; // state of transmitter (off, CW, beacon)
 
 
@@ -66,7 +67,7 @@ void comms_init(void)
 {
 	cdcRxChar = false;
 	
-	// Start the UARTS
+	// Start the internal UARTS
 	gps_uart_init();	
 	ntx2b_uart_init();
 	ext_uart_init();
@@ -207,7 +208,7 @@ void  ntx2b_mod_enable( char mode)
 	dac_set_conversion_trigger(&dac_conf, 0, 0);
 	dac_write_configuration(&MY_DAC, &dac_conf);
 	
-	// Set DAC to Space frequency
+	// Set DAC to Mark frequency
 	dac_set_channel_value(&MY_DAC, NTX2B_DAC, RTTY300_MARK);
 	
 	ioport_set_pin_mode(GPIO_NTX2B_EN, IOPORT_MODE_TOTEM | IOPORT_MODE_INVERT_PIN );
@@ -246,3 +247,12 @@ bool  ntx2b_mod_busy(void)
 	return ntx2b_mod_busy_flag;
 }
 
+int ext_ser_putchar(char c, FILE *stream)
+{
+
+	if (c == '\n')
+	ext_ser_putchar('\r', stream);
+	while(!usart_data_register_is_empty(EXT_USART_SERIAL));
+	usart_putchar(EXT_USART_SERIAL, c);
+	return 0;
+}

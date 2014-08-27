@@ -71,7 +71,7 @@
 #define NTX2B_USART_SERIAL_STOP_BIT      false
 
 #define EXT_USART_SERIAL                 &USARTE0
-#define EXT_USART_SERIAL_BAUDRATE        9600
+#define EXT_USART_SERIAL_BAUDRATE        115200
 #define EXT_USART_SERIAL_CHAR_LENGTH     USART_CHSIZE_8BIT_gc
 #define EXT_USART_SERIAL_PARITY          USART_PMODE_DISABLED_gc
 #define EXT_USART_SERIAL_STOP_BIT        false
@@ -98,7 +98,7 @@ void  ntx2b_mod_transmit( void);
 bool  ntx2b_mod_busy(void);
 
 int comms_usb_putchar(char c, FILE *stream);
-
+int ext_ser_putchar(char c, FILE *stream);
 void dac_init(void);
 
 void gps_uart_init(void);

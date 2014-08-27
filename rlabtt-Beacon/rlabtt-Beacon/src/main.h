@@ -46,7 +46,9 @@
 
 #define EEPROM_MAGIC_NUMBER 0xFACEA55A
 #define EEPROM_CONFIG_VERSION 0x100
-
+#define SERIAL_NONE 0
+#define SERIAL_USB  1
+#define SERIAL_EXT  2
 	
 void evsys_init(void);
 
