@@ -40,10 +40,10 @@
 /*____________________________________________________________________________*/
 
 
-#include <asf.h>
-#include <string.h>  	// String function definitions
-#include <stdio.h>
-#include <avr/pgmspace.h>
+#include "asf.h"
+#include "string.h"  	// String function definitions
+#include "stdio.h"
+#include "avr/pgmspace.h"
 #include "main.h"
 #include "conf_usb.h"
 #include "cmnd.h"
@@ -67,7 +67,14 @@ FILE ntx2bout =FDEV_SETUP_STREAM(ntx2b_ser_putchar, NULL,_FDEV_SETUP_WRITE);
 extern char transmit_state;
 
 // Global configuration
-struct NVCONFIG nvconfig;
+struct MAGIC magic = {.magic_number= EEPROM_MAGIC_NUMBER, .config_version = EEPROM_CONFIG_VERSION};
+	
+struct CONFIG config = {.uart_on_startup = START_UART_AUTO,
+						.beacon_repeat_time = 10,
+						.payload_id = "rlabtt",
+						.modulation_mode = RTTY300,
+						.tx_channel = 1,
+						.tx_trim = 0x40 };
 
 // String to be sent as beacon and its length
 char		beacon_string[100];
@@ -99,9 +106,19 @@ int main(void)
 	// set the board to an initial safe state
 	board_init();
 	
-	// get the configuration from eeprom
+	// get the configuration from eeprom if there else write it
 	
-	get_nvconfig();
+	get_nvmagic(&magic); // get magic number structure from EEPROM
+	if (magic.magic_number == EEPROM_MAGIC_NUMBER && magic.config_version == EEPROM_CONFIG_VERSION)
+	{
+		get_nvconfig(&config);
+	}
+	else
+	{
+		set_nvmagic(&magic);
+		set_nvconfig(&config);
+	}
+	
 
 	//Initialise the delay system
 	delay_init(sysclk_get_cpu_hz())
@@ -109,13 +126,15 @@ int main(void)
 	// default led to off
 	LED_Off(LED0_GPIO);
 	
+	
+	
 	// Start USB stack to authorize VBus monitoring
 	udc_start();
 		
 	
 	// Start the ADC for power monitoring
 	adc_enable(&MY_ADC);
-	
+
 	// Initialise GPS and I2C devices
 	sensor_init();
 	
@@ -180,7 +199,7 @@ void BuildSentence(char *beacon_string)
 	static unsigned long SentenceCounter;
 	dt_format(TimeBuffer, get_gps_time());
 	sprintf(beacon_string, "$$%s,%ld,%s,%08ld,%08ld,%08ld,%08ld,%08ld,%d,%d, %d, %d",
-	nvconfig.payload_id,
+	config.payload_id,
 	SentenceCounter++,
 	TimeBuffer,
 	get_gps_latitude(),

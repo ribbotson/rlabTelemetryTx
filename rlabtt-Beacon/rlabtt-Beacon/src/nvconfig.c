@@ -40,14 +40,39 @@
 /*____________________________________________________________________________*/
 
 #include "nvconfig.h"
+#include "string.h"
+// Buffers for eeprom operations
+uint8_t eeprom_write_page[EEPROM_PAGE_SIZE];
+uint8_t eeprom_read_page[EEPROM_PAGE_SIZE];
 
-// External configuration
-extern struct NVCONFIG nvconfig;
+void get_nvconfig(struct CONFIG * nvconfig)
+{	
+	nvm_eeprom_read_buffer(CONFIG_EEPROM_ADDRESS, eeprom_read_page, EEPROM_PAGE_SIZE);	
+	memcpy(nvconfig, eeprom_read_page, sizeof(struct CONFIG));	
+}
 
-void get_nvconfig(void)
+
+
+void set_nvconfig(struct CONFIG * nvconfig) // save the config structure to EEPROM
 {
-	nvconfig.uart_on_startup = START_UART_USB;
-	nvconfig.beacon_repeat_time = 10;  // units of 500ms beacon every 5 seconds
-	nvconfig.payload_id[10] = "rlabtt";
-	
+	memset(eeprom_write_page, 0, EEPROM_PAGE_SIZE);
+	memcpy(eeprom_write_page, nvconfig, sizeof(struct CONFIG));
+	nvm_eeprom_load_page_to_buffer(eeprom_write_page);
+	nvm_eeprom_atomic_write_page(CONFIG_EEPROM_PAGE);	
+}
+
+
+void get_nvmagic(struct MAGIC * nvmagic) // get magic number structure from EEPROM
+{
+	nvm_eeprom_read_buffer(MAGIC_EEPROM_ADDRESS, eeprom_read_page, EEPROM_PAGE_SIZE);
+	memcpy(nvmagic, eeprom_read_page, sizeof(struct MAGIC));
+}
+
+
+void set_nvmagic(struct MAGIC * nvmagic) // set magic number structure to EEPROM
+{
+	memset(eeprom_write_page, 0, EEPROM_PAGE_SIZE);
+	memcpy(eeprom_write_page, nvmagic, sizeof(struct MAGIC));
+	nvm_eeprom_load_page_to_buffer(eeprom_write_page);
+	nvm_eeprom_atomic_write_page(CONFIG_EEPROM_PAGE);
 }

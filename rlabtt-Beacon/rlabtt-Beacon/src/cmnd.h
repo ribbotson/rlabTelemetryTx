@@ -45,16 +45,16 @@
 
 #ifndef CMND_H_
 #define CMND_H_
-#include <avr/pgmspace.h> 
-#include <ctype.h>
+#include "avr/pgmspace.h"
+#include "ctype.h"
 #include "asf.h"
 #define  CMD_MSG_SIZE      (63)     // Maximum command string length
 
 
-#define FALSE 0
-#define TRUE  1
+//#define FALSE 0
+//#define TRUE  1
 
-#define  NEW_LINE          { putchar('\n'); }
+//#define  NEW_LINE          {  }
 #define  BUILD_VER_MAJOR  1
 #define  BUILD_VER_MINOR  0
 #define  BUILD_VER_DEBUG  00
@@ -83,6 +83,8 @@ void   write_tx_channel_cmd(void);
 void   beacon_cmd( void );
 void   show_status(void);
 void   show_config(void);
+void   read_eeprom(void);
+void   write_eeprom(void);
 void   set_tx_trim_cmd(void);
 void   set_cw_cmd(void);
 void   show_telemetry_cmd(void);

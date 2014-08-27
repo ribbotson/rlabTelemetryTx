@@ -63,8 +63,8 @@ enum {POWER_UNKNOWN, POWER_USB, POWER_BATTERY, POWER_BOTH};
 #define I2C400_ADDRESS	    0x00
 #define I2C400_SPEED        400000ul
 
-#define POWER_OK_VOLTS 3750 // power OK level in ADC counts
-#define ADC_TO_VOLTS
+#define POWER_OK_VOLTS 3500 // power OK level in ADC counts (3500 - 200) / 717 = 4.6V
+
 
 void i2c400_init(void);
 void se95_init(void);

@@ -44,13 +44,8 @@
 
 #include "usb_protocol_cdc.h"
 
-
-
-
-
-
-
-
+#define EEPROM_MAGIC_NUMBER 0xFACEA55A
+#define EEPROM_CONFIG_VERSION 0x100
 
 	
 void evsys_init(void);

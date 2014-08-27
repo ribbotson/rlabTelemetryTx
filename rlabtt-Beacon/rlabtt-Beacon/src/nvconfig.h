@@ -41,21 +41,40 @@
 
 #ifndef NVCONFIG_H_
 #define NVCONFIG_H_
-
+#include "asf.h"
 
 #define		START_UART_USB	0
+#define		START_UART_EXT	1
+#define		START_UART_AUTO 2
 
-// Configuration Data structure
-struct NVCONFIG {
-	char		uart_on_startup;
-	unsigned char beacon_repeat_time; // units of 500ms beacon every 5 seconds
-	char payload_id[10];
-	char		modulation_mode;
+#define		MAGIC_EEPROM_PAGE	0
+#define		CONFIG_EEPROM_PAGE	1
+#define		MAGIC_EEPROM_ADDRESS (MAGIC_EEPROM_PAGE * EEPROM_PAGE_SIZE)
+#define		CONFIG_EEPROM_ADDRESS (CONFIG_EEPROM_PAGE * EEPROM_PAGE_SIZE)
+
+
+// Magic Number structure
+struct MAGIC {
+	long			magic_number;
+	int				config_version;
 };
 
 
-void get_nvconfig(void);
+// Configuration Data structure
+struct CONFIG {
+	char			uart_on_startup;
+	unsigned char	beacon_repeat_time; // units of 500ms 
+	char			payload_id[10];
+	char			modulation_mode;
+	char			tx_channel;
+	char			tx_trim;
+};
 
+
+void get_nvconfig(struct CONFIG *); // get the config structure from EEPROM
+void set_nvconfig(struct CONFIG *); // save the config structure to EEPROM
+void get_nvmagic(struct MAGIC *); // get magic number structure from EEPROM
+void set_nvmagic(struct MAGIC *); // set magic number structure to EEPROM
 
 
 #endif /* NVCONFIG_H_ */

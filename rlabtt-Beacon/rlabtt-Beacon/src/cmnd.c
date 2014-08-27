@@ -45,17 +45,20 @@
 #include  "cmnd.h"
 #include "udi_cdc.h"
 #include "gendef.h"
-#include <stdlib.h>
+#include "stdlib.h"
+#include "stdio.h"
 #include "asf.h"
 #include "main.h" 
 #include "sensor.h"
 #include "timer.h"
+#include "comms.h"
+#include "nvconfig.h"
 
 extern int build_major;
 extern int build_minor;
 extern int build_release;
 extern char * build_date;
-
+extern struct CONFIG config;
 extern FILE usbout;
 extern FILE ntx2bout;
 
@@ -95,6 +98,8 @@ const  struct  CmndTableEntry_t  asCommand[] =
 	{ 'C','H',    set_tx_channel_cmd },
 	{ 'S','T',    show_status		 },	
 	{ 'C','O',    show_config		 },	
+	{ 'E','R',    read_eeprom		 },			
+	{ 'E','W',    write_eeprom		 },			
 	{ 'W','C',    write_tx_channel_cmd},
 	{ 'F','O',    set_tx_trim_cmd    },	
 	{ 'C','W',    set_cw_cmd	     },	
@@ -174,7 +179,7 @@ void  hci_exec_command( void )
 	}
 	if ( yFoundCndName )
 	{
-		NEW_LINE;
+		putchar('\n');
 		(*asCommand[n].Function)();     // Do command function
 	}
 	else  hci_put_cmd_error();          // Unrecognised command
@@ -232,6 +237,8 @@ const  char  acHelpStrTR[] PROGMEM = "FO [aa]   | Read/Set TX Trim\n";
 const  char  acHelpStrCW[] PROGMEM = "CW [a]    | Read/Set CW Enable\n";
 const  char  acHelpStrBE[] PROGMEM = "BE [a]    | Beacon Transmit Enable\n";
 const  char  acHelpStrCO[] PROGMEM = "CO        | Show Configuration\n";
+const  char  acHelpStrER[] PROGMEM = "ER        | Read from EEPROM\n";
+const  char  acHelpStrEW[] PROGMEM = "EW        | Write to EEPROM\n";
 const  char  acHelpStrST[] PROGMEM = "ST        | Show Status\n";
 const  char  acHelpStrTD[] PROGMEM = "TD        | Show Telemetry Data\n";
 
@@ -254,6 +261,8 @@ void  list_cmd( void )
 	printf_P( acHelpStrTD );
 	printf_P( acHelpStrST );
 	printf_P( acHelpStrCO );
+	printf_P( acHelpStrER );
+	printf_P( acHelpStrEW );
 }
 
 
@@ -345,11 +354,15 @@ void angle_format( char * anglestring, signed long anglevalue)
 */
 void  adc_cmd( void )
 {
-	int BV = adc_get_result(&MY_ADC, VBATT_ADC_CH);
-	BV = (4 * BV)/3;
-	int UV = adc_get_result(&MY_ADC, VUSB_ADC_CH);
-	UV = (4 * UV) /3;
-	printf("VBATT = %d.%dV  VUSB = %d.%dV", BV / 1000, BV % 1000, UV /1000, UV % 1000);	
+	float BV = (float) adc_get_result(&MY_ADC, VBATT_ADC_CH);
+	BV = BV - 200;
+	if(BV < 0) BV = 0;
+	BV = BV/717;
+	float UV = (float) adc_get_result(&MY_ADC, VUSB_ADC_CH);
+	UV = UV- 200;
+	if(UV < 0) UV = 0;
+	UV = UV/717;
+	printf("VBATT = %1.2fV  VUSB = %1.2fV", BV, UV);	
 }
 
 
@@ -447,6 +460,42 @@ void set_tx_trim_cmd(void)
 void   show_config(void)
 {
 		
+		printf("Serial at Startup = ");
+		if (config.uart_on_startup == START_UART_USB) printf("USB\n");
+		else if(config.uart_on_startup == START_UART_EXT) printf("EXT UART\n"); 
+		else if(config.uart_on_startup == START_UART_AUTO) printf("Auto Detect\n");	
+		else printf("??\n");	
+		
+		printf("Beacon Repeat Time = %d\n", config.beacon_repeat_time);
+		
+		printf("Payload ID = %s\n", config.payload_id);
+		
+		printf("Modulation Mode = ");
+		if(config.modulation_mode == RTTY300) printf("RTTY 300 baud\n");
+		else printf("??\n");
+		
+		printf("Transmit Channel = %x\n", config.tx_channel);
+		
+		printf("Transmit Trim = %X\n", config.tx_trim);
+		
+		
+		unsigned char	beacon_repeat_time; // units of 500ms
+		char			payload_id[10];
+		char			modulation_mode;
+		char			tx_channel;
+		char			tx_trim;	
+	
+}
+
+void   read_eeprom(void)
+{
+	
+	
+}
+
+void   write_eeprom(void)
+{
+	
 	
 }
 

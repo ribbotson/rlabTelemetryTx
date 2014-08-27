@@ -58,9 +58,6 @@
 // From module: ADC - XMEGA A/AU Implementation
 #include <adc.h>
 
-// From module: AES - Advanced Encryption Standard
-#include <aes.h>
-
 // From module: CPU specific features
 #include <ccp.h>
 #include <xmega_reset_cause.h>
@@ -69,7 +66,7 @@
 #include <calendar.h>
 
 // From module: Common build items for user board support templates
-#include <board.h>
+#include <user_board.h>
 
 // From module: DAC - Digital to Analog Converter
 #include <dac.h>
@@ -82,10 +79,6 @@
 
 // From module: Generic board support
 #include <board.h>
-
-// LED support enabled
-#include <led.h>
-
 
 // From module: IOPORT - General purpose I/O service
 #include <ioport.h>

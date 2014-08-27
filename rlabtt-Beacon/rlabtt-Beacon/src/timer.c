@@ -63,7 +63,7 @@ extern unsigned char beacon_repeat_time;
 extern char		beacon_string[100];
 extern unsigned char	beacon_length;
 // External configuration
-extern struct NVCONFIG nvconfig;
+extern struct CONFIG config;
 
 void timer_init(void)
 {
@@ -130,7 +130,7 @@ void millisecTimer(void)
 		b500msecTimer = 0;
 		bBeaconTimer++;
 	}
-	if ( bBeaconTimer >= nvconfig.beacon_repeat_time )
+	if ( bBeaconTimer >= config.beacon_repeat_time )
 	{
 		bBeaconTaskReq = 1;
 		bBeaconTimer = 0;

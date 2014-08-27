@@ -64,7 +64,7 @@ char transmit_state = TRANSMIT_OFF; // state of transmitter (off, CW, beacon)
 
 void comms_init(void)
 {
-	cdcRxChar = FALSE;
+	cdcRxChar = false;
 	
 	// Start the UARTS
 	gps_uart_init();	
@@ -90,7 +90,7 @@ bool comms_cdcgotchar()
 
 void comms_cdc_clr_gotchar(void)
 {
-	cdcRxChar = FALSE;
+	cdcRxChar = false;
 }
 
 int comms_usb_putchar(char c, FILE *stream)
@@ -118,7 +118,7 @@ void comms_cdc_set_dtr(uint8_t port, bool b_enable)
 
 void comms_cdc_rx_notify(uint8_t port)
 {
-	cdcRxChar = TRUE;
+	cdcRxChar = true;
 }
 
 void dac_init(void){
